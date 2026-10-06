@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        StockPilot | Dashboard
+    </title>
+
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="app-layout">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="brand-icon">
+                SP
+            </div>
+
+            <div>
+
+                <strong>
+                    StockPilot
+                </strong>
+
+                <small>
+                    Inventory Control
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="#"
+                class="nav-item active"
+            >
+
+                <i class="bi bi-grid-1x2-fill"></i>
+
+                Dashboard
+
+            </a>
+
+
+            <a
+                href="#productsSection"
+                class="nav-item"
+            >
+
+                <i class="bi bi-box-seam"></i>
+
+                Products
+
+            </a>
+
+
+            <a
+                href="#attentionSection"
+                class="nav-item"
+            >
+
+                <i class="bi bi-exclamation-triangle"></i>
+
+                Inventory Alerts
+
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="user-mini">
+
+                <div class="user-avatar">
+                    A
+                </div>
+
+                <div>
+
+                    <strong id="sidebarUsername">
+                        Admin
+                    </strong>
+
+                    <small>
+                        Administrator
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="logout-btn"
+                onclick="logout()"
+            >
+
+                <i class="bi bi-box-arrow-right"></i>
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Inventory Dashboard
+                </h1>
+
+                <p>
+                    Monitor and manage your product inventory.
+                </p>
+
+            </div>
+
+
+            <div class="topbar-actions">
+
+                <button
+                    class="btn btn-light"
+                    onclick="refreshDashboard()"
+                >
+
+                    <i class="bi bi-arrow-clockwise"></i>
+
+                    Refresh
+
+                </button>
+
+
+                <button
+                    class="btn btn-primary"
+                    onclick="openAddProductModal()"
+                >
+
+                    <i class="bi bi-plus-lg"></i>
+
+                    Add Product
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- STATS -->
+
+        <section class="stats-grid">
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Products
+                    </span>
+
+                    <strong id="totalProducts">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        In Stock
+                    </span>
+
+                    <strong id="inStock">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon orange">
+                    <i class="bi bi-exclamation-circle"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Low Stock
+                    </span>
+
+                    <strong id="lowStock">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon red">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Out of Stock
+                    </span>
+
+                    <strong id="outOfStock">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- ANALYTICS -->
+
+        <section class="analytics-grid">
+
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Inventory Health
+                        </h3>
+
+                        <p>
+                            Percentage of products currently well stocked.
+                        </p>
+
+                    </div>
+
+                    <strong
+                        id="healthScore"
+                        class="health-score"
+                    >
+                        0%
+                    </strong>
+
+                </div>
+
+
+                <div class="progress health-progress">
+
+                    <div
+                        id="healthProgress"
+                        class="progress-bar"
+                        style="width: 0%"
+                    ></div>
+
+                </div>
+
+
+                <div class="health-meta">
+
+                    <span>
+                        Total stock units:
+                    </span>
+
+                    <strong id="totalStockUnits">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Inventory Overview
+                        </h3>
+
+                        <p>
+                            Current stock distribution.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="inventoryChart"
+                    ></canvas>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- ATTENTION -->
+
+        <section
+            id="attentionSection"
+            class="dashboard-card"
+        >
+
+            <div class="card-header">
+
+                <div>
+
+                    <h3>
+                        <i class="bi bi-exclamation-triangle text-warning"></i>
+
+                        Needs Attention
+                    </h3>
+
+                    <p>
+                        Products that are low or out of stock.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="attentionGrid"
+                class="attention-grid"
+            >
+
+                <div class="loading-state">
+                    Loading alerts...
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRODUCTS -->
+
+        <section
+            id="productsSection"
+            class="dashboard-card products-card"
+        >
+
+            <div class="products-header">
+
+                <div>
+
+                    <h3>
+                        Products
+                    </h3>
+
+                    <p id="productCountLabel">
+                        0 products
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="btn btn-outline-success"
+                    onclick="exportCSV()"
+                >
+
+                    <i class="bi bi-download"></i>
+
+                    Export CSV
+
+                </button>
+
+            </div>
+
+
+            <!-- FILTERS -->
+
+            <div class="filter-bar">
+
+
+                <div class="search-box">
+
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search products..."
+                    >
+
+                </div>
+
+
+                <select
+                    id="categoryFilter"
+                    class="form-select"
+                >
+
+                    <option value="all">
+                        All Categories
+                    </option>
+
+                </select>
+
+
+                <select
+                    id="sortFilter"
+                    class="form-select"
+                >
+
+                    <option value="">
+                        Sort By
+                    </option>
+
+                    <option value="name_asc">
+                        Name: A-Z
+                    </option>
+
+                    <option value="name_desc">
+                        Name: Z-A
+                    </option>
+
+                    <option value="price_asc">
+                        Price: Low to High
+                    </option>
+
+                    <option value="price_desc">
+                        Price: High to Low
+                    </option>
+
+                    <option value="stock_asc">
+                        Stock: Low to High
+                    </option>
+
+                    <option value="stock_desc">
+                        Stock: High to Low
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="table-responsive">
+
+                <table class="table product-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Product
+                            </th>
+
+                            <th>
+                                Category
+                            </th>
+
+                            <th>
+                                Price
+                            </th>
+
+                            <th>
+                                Stock
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Updated
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="productsTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="text-center py-5"
+                            >
+                                Loading products...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- PAGINATION -->
+
+            <div
+                id="pagination"
+                class="pagination-container"
+            ></div>
+
+
+        </section>
+
+
+        <footer>
+
+            <span>
+                StockPilot Inventory Management
+            </span>
+
+            <span>
+                Flask • REST API • SQLAlchemy • SQLite
+            </span>
+
+        </footer>
+
+
+    </main>
+
+</div>
+
+
+<!-- ADD / EDIT MODAL -->
+
+<div
+    class="modal fade"
+    id="productModal"
+    tabindex="-1"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="productModalTitle"
+                >
+                    Add New Product
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
+
+            </div>
+
+
+            <form
+                id="productForm"
+                onsubmit="saveProduct(event)"
+            >
+
+                <div class="modal-body">
+
+                    <div
+                        id="formError"
+                        class="alert alert-danger d-none"
+                    ></div>
+
+
+                    <input
+                        type="hidden"
+                        id="productId"
+                    >
+
+
+                    <div class="mb-3">
+
+                        <label
+                            class="form-label"
+                            for="productName"
+                        >
+                            Product Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="productName"
+                            class="form-control"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <label
+                            class="form-label"
+                            for="productCategory"
+                        >
+                            Category
+                        </label>
+
+                        <input
+                            type="text"
+                            id="productCategory"
+                            class="form-control"
+                            placeholder="Electronics"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label
+                                class="form-label"
+                                for="productPrice"
+                            >
+                                Price
+                            </label>
+
+                            <input
+                                type="number"
+                                id="productPrice"
+                                class="form-control"
+                                min="0.01"
+                                step="0.01"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+
+                            <label
+                                class="form-label"
+                                for="productStock"
+                            >
+                                Stock Quantity
+                            </label>
+
+                            <input
+                                type="number"
+                                id="productStock"
+                                class="form-control"
+                                min="0"
+                                step="1"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <label
+                            class="form-label"
+                            for="productDescription"
+                        >
+                            Description
+                        </label>
+
+                        <textarea
+                            id="productDescription"
+                            class="form-control"
+                            rows="4"
+                            maxlength="1000"
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Save Product
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- DETAILS MODAL -->
+
+<div
+    class="modal fade"
+    id="detailsModal"
+    tabindex="-1"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Product Details
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
+
+            </div>
+
+
+            <div
+                id="productDetails"
+                class="modal-body"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
+<script
+    src="{{ url_for('static', filename='js/app.js') }}"
+></script>
+
+
+</body>
+
+</html>
